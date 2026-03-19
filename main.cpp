@@ -1,24 +1,32 @@
+#include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include "LinkedList.h"
+#include "Ally.h"
+
+using namespace std;
 
 void introduction() {
     cout << "Welcome to the Castle Adventure!\n";
-    cout << "You will navigate through various rooms in the castle, encountering challenges and making decisions that will determine your path.\n";
-    cout << "Choose your actions wisely. Let's start your journey!\n\n";
+    cout << "You will navigate through various rooms in the castle.\n\n";
+}
+
+void showAlly(const Ally& ally) {
+    ally.display();
 }
 
 
-#include <fstream>
-#include <sstream>
-#include "LinkedList.h"
+void levelUpAlly(Ally& ally) {
+    ally.levelUp();
+}
 
 int main() {
     LinkedList castleRooms;
     ifstream file("rooms.csv");
     string line;
 
-    // Reading rooms from the CSV file
+    // Load rooms
     if (file.is_open()) {
         while (getline(file, line)) {
             stringstream ss(line);
@@ -41,40 +49,70 @@ int main() {
         }
         file.close();
     } else {
-        cout << "Unable to open file" << endl;
+        cout << "Unable to open file\n";
         return 1;
     }
 
-    // Introduction
     introduction();
 
-    // Interaction with rooms
-    auto current = castleRooms.getHead();
-    while (current != nullptr) {
-        cout << current->room.toString() << endl;
+    //ally
+    Ally ally("Knight", "Warrior", 1);
 
-        // Display actions for the current room
-        int actionNum = 1;
-        for (const auto& action : current->room.getActions()) {
-            cout << actionNum++ << ". " << action << endl;
+    cout << "\nYou meet an ally!\n";
+    showAlly(ally);
+
+    cout << "\nYour ally helps you...\n";
+    levelUpAlly(ally);
+
+    auto current = castleRooms.getHead();
+
+    // MAIN LOOP
+    while (current != nullptr) {
+
+        cout << "\n====================================\n";
+        cout << "        CURRENT ROOM\n";
+        cout << "====================================\n";
+
+        cout << current->room.toString() << endl;
+        cout << current->food.toString() << endl;
+
+        vector<string> actions = current->room.getActions();
+
+        cout << "\nActions:\n";
+        for (int i = 0; i < actions.size(); i++) {
+            cout << i + 1 << ". " << actions[i] << endl;
         }
 
-        // User chooses an action
+        cout << "4. Exit game\n";
+
+        cout << "\n------------------------------------\n";
+        cout << "Choose an action (1-4): ";
+
         int choice;
-        cout << "Choose an action (1-" << current->room.getActions().size() << "): ";
         cin >> choice;
 
-        // Process choice
-        if (choice < 1 || choice > current->room.getActions().size()) {
-            cout << "Invalid choice. Try again.\n";
-        } else {
-            cout << "You chose: " << current->room.getActions()[choice - 1] << endl;
-            if (choice == current->room.getActions().size()) {  // Assumes 'Leave the room' is the last action
-                current = current->next;  // Move to next room
-            }
+        // exit
+        if (choice == 4) {
+            cout << "\nExiting game... Goodbye!\n";
+            break;
         }
+
+        // VALIDATION
+        if (choice < 1 || choice > actions.size()) {
+            cout << "\nInvalid choice. Try again.\n";
+            continue;
+        }
+
+        cout << "\n👉 You chose: " << actions[choice - 1] << endl;
+
+        //NEXT ROOM
+        if (actions[choice - 1] == "Leave the room") {
+            current = current->next;
+        }
+
+        cout << "\n------------------------------------\n";
     }
 
-    cout << "You have reached the end of your adventure!\n";
+    cout << "\nEnd of adventure!\n";
     return 0;
 }

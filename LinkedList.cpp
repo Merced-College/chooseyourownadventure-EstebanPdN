@@ -1,28 +1,35 @@
-// LinkedList.cpp
 #include "LinkedList.h"
 
-Node::Node(Room room) : room(room), next(nullptr) {}
+Node::Node(Room room, Food food) : room(room), food(food), next(nullptr) {}
 
 LinkedList::LinkedList() : head(nullptr) {}
 
 void LinkedList::addRoom(const Room& room) {
-    auto newNode = make_shared<Node>(room);
+    // Temporary Food (simple integration for assignment)
+    vector<string> actions = {"Eat", "Ignore"};
+    Food food("Apple", "Fruit", 50, "A red apple", actions);
+
+    shared_ptr<Node> newNode = make_shared<Node>(room, food);
+
     if (!head) {
         head = newNode;
-    } else {
-        auto current = head;
-        while (current->next) {
-            current = current->next;
-        }
-        current->next = newNode;
+        return;
     }
+
+    auto temp = head;
+    while (temp->next) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
 }
 
 void LinkedList::displayRooms() {
-    auto current = head;
-    while (current) {
-        cout << current->room.toString() << endl;
-        current = current->next;
+    auto temp = head;
+    while (temp) {
+        cout << temp->room.toString() << endl;
+        cout << temp->food.toString() << endl;
+        cout << "----------------------\n";
+        temp = temp->next;
     }
 }
 
